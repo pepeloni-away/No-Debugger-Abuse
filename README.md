@@ -1,2 +1,4 @@
 # No-Debugger-Abuse
-stop websites from constantly calling the javascript debugger statement when browser dev tools are open
+
+Install from https://github.com/pepeloni-away/No-Debugger-Abuse/raw/main/No%20Debugger%20Abuse.user.js <br>
+only tested on firefox violentmonkey
