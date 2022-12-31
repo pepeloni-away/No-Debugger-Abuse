@@ -10,18 +10,18 @@
 // @description disable and log calls to javsacript debugger
 // ==/UserScript==
 
-const logs = true
+const logs = false
 const details = true
-const here = location.href.replace(/^http(s)?:\/\//, '') > 75 ?
-      location.href.replace(/^http(s)?:\/\//, '').substring(0,75) + '...' : location.href.replace(/^http(s)?:\/\//, '')
-const l = (...args) => (console.log?.name == 'log' ? console.log : false || console.log?.name == 'info' ? console.log : false || console.debug)(...args)
+const here = (url => { url = url.replace('https://', ''); return url.length < 75 ? url : url.substring(0, 75) + "..." })(location.href)
+const {log, info, debug, warn} = console
+const l = log || info || debug || warn(...args)
 let lastCall
 self.Function.prototype.constructor = new Proxy(self.Function.prototype.constructor, {
    apply: function(target, thisArg, args) {
        let fnContent, callerContent, date, diff
        try {
            fnContent = args[0]
-           callerContent = thisArg?.toString()
+           try { callerContent = thisArg.toString() } catch(e) { callerContent = "Function.prototype.toString called on incompatible object" }
            date = new Date()
            lastCall ? diff = date.getTime() - lastCall.getTime() : diff = 0
            logs ? details ? l(`debugger call on ${here}`, diff, `ms since last call\ncalled by`, thisArg, `content:\n${callerContent}`) :
