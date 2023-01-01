@@ -7,7 +7,7 @@
 // @grant       none
 // @version     1.1
 // @author      pploni
-// @description disable and log calls to javsacript debugger
+// @description Disable and optinally log calls to javascript debugger
 // ==/UserScript==
 
 const logs = false,
