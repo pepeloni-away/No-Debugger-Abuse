@@ -5,16 +5,16 @@
 // @run-at      document-start
 // @insert-into page
 // @grant       none
-// @version     1.0
+// @version     1.1
 // @author      pploni
 // @description disable and log calls to javsacript debugger
 // ==/UserScript==
 
-const logs = false
-const details = true
-const here = (url => { url = url.replace('https://', ''); return url.length < 75 ? url : url.substring(0, 75) + "..." })(location.href)
-const {log, info, debug, warn} = console
-const l = log || info || debug || warn(...args)
+const logs = false,
+      details = true,
+      here = (url => { url = url.replace('https://', ''); return url.length < 75 ? url : url.substring(0, 75) + "..." })(location.href),
+      {log, info, debug, warn} = console,
+      l = (...args) => (log || info || debug || warn)(...args)
 let lastCall
 self.Function.prototype.constructor = new Proxy(self.Function.prototype.constructor, {
    apply: function(target, thisArg, args) {
