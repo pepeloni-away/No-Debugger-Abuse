@@ -14,7 +14,7 @@ const logs = false,
       details = true,
       here = (url => { url = url.replace('https://', ''); return url.length < 75 ? url : url.substring(0, 75) + "..." })(location.href),
       {log, info, debug, warn} = console,
-      l = (...args) => (log || info || debug || warn)(...args)
+      l = (...args) => (debug || log || info || warn)(...args)
 let lastCall
 self.Function.prototype.constructor = new Proxy(self.Function.prototype.constructor, {
    apply: function(target, thisArg, args) {
