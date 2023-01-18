@@ -5,7 +5,7 @@
 // @run-at      document-start
 // @insert-into page
 // @grant       none
-// @version     1.1
+// @version     1.2
 // @author      pploni
 // @description Disable and optinally log calls to javascript debugger
 // ==/UserScript==
@@ -18,13 +18,18 @@ const logs = false,
 let lastCall
 self.Function.prototype.constructor = new Proxy(self.Function.prototype.constructor, {
    apply: function(target, thisArg, args) {
-       let fnContent, callerContent, date, diff
+       let fnContent, caller = this.apply?.caller, callerContent, date, diff
        try {
            fnContent = args[0]
-           try { callerContent = thisArg.toString() } catch(e) { callerContent = "Function.prototype.toString called on incompatible object" }
+           /* https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/caller#browser_compatibility
+            * Function.prototype.caller is non-standard but supported by everything
+            * you may use it like in the line below to "walk the stack" i.e. see caller of this apply trap and its caller and its caller ...
+            * l(this.apply.caller, this.apply.caller.caller, this.apply.caller.caller.caller) */
+           if (!caller) caller = thisArg
+           try { callerContent = caller.toString() } catch(e) { callerContent = e.toString() }
            date = new Date()
            lastCall ? diff = date.getTime() - lastCall.getTime() : diff = 0
-           logs ? details ? l(`debugger call on ${here}`, diff, `ms since last call\ncalled by`, thisArg, `content:\n${callerContent}`) :
+           logs ? details ? l(`debugger call on ${here}`, diff, `ms since last call\ncalled by`, caller, `content:\n${callerContent}`) :
            l(`debugger call on ${here}`, diff, `ms since last call`) : null
            lastCall = date
        } catch (err) {
@@ -34,4 +39,5 @@ self.Function.prototype.constructor = new Proxy(self.Function.prototype.construc
        return target.apply(thisArg, args)
    }
 })
-self.Function = self.Function.constructor // some libs check if sth is a function by comparing its constructor with Function
+// keep this equality because some libraries check if something is a function by comparing its constructor with Function
+self.Function = self.Function.constructor
