@@ -5,7 +5,7 @@
 // @run-at      document-start
 // @insert-into page
 // @grant       none
-// @version     1.2
+// @version     1.3
 // @author      pploni
 // @description Disable and optinally log calls to javascript debugger
 // ==/UserScript==
@@ -18,14 +18,13 @@ const logs = false,
 let lastCall
 self.Function.prototype.constructor = new Proxy(self.Function.prototype.constructor, {
    apply: function(target, thisArg, args) {
+       /* https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/caller#browser_compatibility
+        * Function.prototype.caller is non-standard but supported by everything
+        * caller may access arguments object and its own caller (>ω^) (^_~) */
        let fnContent, caller = this.apply?.caller, callerContent, date, diff
        try {
            fnContent = args[0]
-           /* https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/caller#browser_compatibility
-            * Function.prototype.caller is non-standard but supported by everything
-            * you may use it like in the line below to "walk the stack" i.e. see caller of this apply trap and its caller and its caller ...
-            * l(this.apply.caller, this.apply.caller.caller, this.apply.caller.caller.caller) */
-           if (!caller) caller = thisArg
+           caller ||= thisArg
            try { callerContent = caller.toString() } catch(e) { callerContent = e.toString() }
            date = new Date()
            lastCall ? diff = date.getTime() - lastCall.getTime() : diff = 0
